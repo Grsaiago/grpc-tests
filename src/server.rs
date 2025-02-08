@@ -19,6 +19,7 @@ pub struct MyGreeter {
     counter: AtomicU64,
 }
 
+// each service becomes a trait that I have to implement for some type
 #[tonic::async_trait]
 impl Greeter for MyGreeter {
     async fn say_hello(
@@ -55,6 +56,8 @@ async fn main() {
         .layer(
             ServiceBuilder::new().layer(
                 TraceLayer::new_for_grpc()
+                    // grpc is built on top of heet2, so we can have this makespanwith passing an
+                    // http::Request as a parameter
                     .make_span_with(|req: &Request<_>| {
                         info_span!("grpc_request",
                             id = %format_request_id(req.headers())
